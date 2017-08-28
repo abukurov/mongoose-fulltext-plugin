@@ -1,0 +1,35 @@
+{
+  "name": "mongoose-fulltext-plugin",
+  "version": "1.0.1",
+  "description": "",
+  "keywords": [
+    "mongoose",
+    "mongoose-plugin",
+    "search",
+    "fulltext",
+    "n-gram",
+    "filter",
+    "query"
+  ],
+  "scripts": {
+    "lint": "eslint ./"
+  },
+  "main": "index.js",
+  "author": "Alex Bukurov <abukurov@hwdtech.ru>",
+  "license": "MIT",
+  "homepage": "https://github.com/abukurov/mongoose-fulltext-plugin#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abukurov/mongoose-fulltext-plugin.git"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "mongoose": "latest",
+    "n-gram": "^1.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.0.0",
+    "eslint-config-airbnb-base": "^11.0.0",
+    "eslint-plugin-import": "^2.2.0"
+  }
+}
