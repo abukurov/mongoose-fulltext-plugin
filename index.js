@@ -9,7 +9,7 @@ function createNGrams(input, withSuffix = false, min = 2) {
 
   for (let index = 0; index <= (withSuffix ? string.length - min : 0); index += 1) {
     for (let cardinality = index + min; cardinality <= string.length; cardinality += 1) {
-      nGrams.push(string.slice(index, cardinality));
+      nGrams.push(string.slice(index, cardinality).toLowerCase());
     }
   }
 
@@ -50,7 +50,7 @@ module.exports = function mongooseFulltextPlugin(schema, options = {}) {
 
   // eslint-disable-next-line no-param-reassign
   schema.statics.search = function search(query = '', ...other) {
-    const normalizedQuery = (String(query) || '').replace(PUNCTUATION_RE, '');
+    const normalizedQuery = (String(query) || '').replace(PUNCTUATION_RE, '').toLowerCase();
 
     return this.find(normalizedQuery.length >= 2 ? {
       $text: {
