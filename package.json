@@ -1,12 +1,14 @@
 {
   "name": "mongoose-fulltext-plugin",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "keywords": [
     "mongoose",
     "mongoose-plugin",
     "search",
     "fulltext",
+    "index",
+    "text",
     "n-gram",
     "filter",
     "query"
@@ -24,8 +26,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.4",
-    "mongoose": "latest",
-    "n-gram": "^1.0.0"
+    "mongoose": "latest"
   },
   "devDependencies": {
     "eslint": "^4.0.0",

@@ -1,45 +1,63 @@
 const _ = require('lodash/fp');
-const transformToBigram = require('n-gram').bigram;
 
-const PUNCTUATION_RE = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\s\-.\/:;<=>?@\[\]^_`{|}~]/g;
+const WHITESPACE_RE = /[\s\f\n\r\t\v\u00A0\u2028\u2029]+/;
+const PUNCTUATION_RE = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-./:;<=>?@[\]^_`{|}~]/g;
+
+function createNGrams(input, withSuffix = false, min = 2) {
+  const nGrams = [];
+  const string = String(input);
+
+  for (let index = 0; index <= (withSuffix ? string.length - min : 0); index += 1) {
+    for (let cardinality = index + min; cardinality <= string.length; cardinality += 1) {
+      nGrams.push(string.slice(index, cardinality));
+    }
+  }
+
+  return nGrams;
+}
 
 module.exports = function mongooseFulltextPlugin(schema, options = {}) {
-  const bigramPath = options.bigramPath || '_bigram';
+  schema.path('__nGrams', String);
+  schema.path('__prefixNGrams', String);
 
-  schema.path(bigramPath, {
-    type: [String],
-    lowercase: true,
-    index: true,
+  schema.index({
+    __nGrams: 'text',
+    __prefixNGrams: 'text',
+  }, {
+    name: 'NGrams Index',
+    weights: {
+      __nGrams: 100,
+      __prefixNGrams: 200,
+    },
   });
 
   schema.pre('save', function preSaveHook(next) {
     const plainDocument = this.toObject();
     const fields = options.fields || Object.keys(plainDocument);
-    const normalizeBigram = _.flow([
-      _.without(['id', '_id', '__v', bigramPath]),
+    const attributes = _.flow([
+      _.without(['id', '_id', '__v', '__nGrams', '__prefixNGrams']),
       _.map(attribute => _.get(attribute)(plainDocument)),
       _.filter(value => _.isString(value) && value),
       _.replace(PUNCTUATION_RE, ''),
-      transformToBigram,
-      _.uniq
-    ]);
+      _.split(WHITESPACE_RE),
+    ])(fields);
 
-    this.set(bigramPath, normalizeBigram(fields));
+    this.set('__nGrams', attributes.map(attribute => createNGrams(attribute, true)));
+    this.set('__prefixNGrams', attributes.map(attribute => createNGrams(attribute)));
+
     next();
   });
 
   // eslint-disable-next-line no-param-reassign
-  schema.statics.search = function search(query = '', ...rest) {
-    const words = query.split(/\s+/)
-      .map(word => word.replace(PUNCTUATION_RE, ''))
-      .filter(word => _.size(word) >= 2);
+  schema.statics.search = function search(query = '', ...other) {
+    const normalizedQuery = (String(query) || '').replace(PUNCTUATION_RE, '');
 
-    return this.find(!_.isEmpty(words) ? {
-      $or: words.map(word => ({
-        [bigramPath]: {
-          $all: transformToBigram(word),
-        },
-      })),
-    } : {}, ...rest);
+    return this.find(normalizedQuery.length >= 2 ? {
+      $text: {
+        $search: normalizedQuery,
+      },
+    } : {}, ...other);
   };
 };
+
+module.exports.createNGrams = createNGrams;
