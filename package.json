@@ -1,6 +1,6 @@
 {
   "name": "mongoose-fulltext-plugin",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "keywords": [
     "mongoose",
@@ -11,7 +11,9 @@
     "text",
     "n-gram",
     "filter",
-    "query"
+    "query",
+    "stem",
+    "stemmer"
   ],
   "scripts": {
     "lint": "eslint ./"
@@ -26,7 +28,8 @@
   },
   "dependencies": {
     "lodash": "^4.17.4",
-    "mongoose": "latest"
+    "mongoose": "latest",
+    "stemmer": "^1.0.1"
   },
   "devDependencies": {
     "eslint": "^4.0.0",

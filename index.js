@@ -1,4 +1,5 @@
 const _ = require('lodash/fp');
+const defaultStemmer = require('stemmer');
 
 const WHITESPACE_RE = /[\s\f\n\r\t\v\u00A0\u2028\u2029]+/;
 const PUNCTUATION_RE = /[\u2000-\u206F\u2E00-\u2E7F\\'!"#$%&()*+,\-./:;<=>?@[\]^_`{|}~]/g;
@@ -17,6 +18,8 @@ function createNGrams(input, withSuffix = false, min = 2) {
 }
 
 module.exports = function mongooseFulltextPlugin(schema, options = {}) {
+  const stemmer = options.stemmer || defaultStemmer;
+
   schema.path('__nGrams', String);
   schema.path('__prefixNGrams', String);
 
@@ -40,6 +43,7 @@ module.exports = function mongooseFulltextPlugin(schema, options = {}) {
       _.filter(value => _.isString(value) && value),
       _.replace(PUNCTUATION_RE, ''),
       _.split(WHITESPACE_RE),
+      _.map(stemmer)
     ])(fields);
 
     this.set('__nGrams', attributes.map(attribute => createNGrams(attribute, true)));

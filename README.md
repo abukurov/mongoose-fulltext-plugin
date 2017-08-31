@@ -1,4 +1,4 @@
-mongoose-fulltext-plugin
+# mongoose-fulltext-plugin
 
 N-gram based searching for [mongoose](https://github.com/Automattic/mongoose) models
 
@@ -31,14 +31,7 @@ const Model = mongoose.model('YourModelName', schema);
 Model.search('custom text').then(...);
 ```
 
-## Plugin Options
+## Plugin Options 
 
-- `fields` specifies which fields fields to be used for computing n-grams. default to all string fields
-
-Example:
-
-```js
-schema.plugin(fulltext, {
-    fields: ['title']
-});
-```
+* `fields` - array of document fields to be used for computing n-grams. All string fields by default. 
+* `stemmer` - function to be used for computing word stem. [stemmer](https://www.npmjs.com/package/stemmer) by default.
